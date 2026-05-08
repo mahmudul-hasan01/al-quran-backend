@@ -23,7 +23,7 @@ router.get("/surahs/:id", async (req, res) => {
     const { id } = req.params;
     const { q } = req.query;
 
-    const surah = await Surah.findById(id).lean();
+    const surah = await Surah.findOne({ id: id }).lean();
 
     if (!surah) {
       return res.status(404).json({ error: "Surah not found" });

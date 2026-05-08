@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://al-quran-snowy.vercel.app",
+    origin: ["https://al-quran-snowy.vercel.app", "http://localhost:3000"],
   }),
 );
 app.use(express.json());
