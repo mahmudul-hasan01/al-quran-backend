@@ -1,5 +1,5 @@
 // backend/models/Surah.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const verseSchema = new mongoose.Schema(
   {
@@ -20,4 +20,4 @@ const surahSchema = new mongoose.Schema({
   verses: [verseSchema],
 });
 
-module.exports = mongoose.model("Surah", surahSchema);
+export default mongoose.model("Surah", surahSchema);

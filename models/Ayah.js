@@ -1,5 +1,5 @@
 // backend/models/Ayah.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ayahSchema = new mongoose.Schema({
   number: { type: Number, required: true },
@@ -11,4 +11,4 @@ const ayahSchema = new mongoose.Schema({
 // Compound index for unique ayah within surah
 ayahSchema.index({ surahNumber: 1, number: 1 }, { unique: true });
 
-module.exports = mongoose.model("Ayah", ayahSchema);
+export default mongoose.model("Ayah", ayahSchema);

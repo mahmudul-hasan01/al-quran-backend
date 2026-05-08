@@ -1,48 +1,78 @@
 // backend/routes/quranRoutes.js
-const express = require("express");
+
+import express from "express";
+import Surah from "../models/Surah.js";
+
 const router = express.Router();
-const Surah = require("../models/Surah");
 
 function escapeRegex(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Get all surahs (without verses)
+// Get all surahs
 router.get("/surahs", async (req, res) => {
+  const { q } = req.query;
+
   try {
+    if (q) {
+      const regex = new RegExp(escapeRegex(q.trim()), "i");
+
+      const surahs = await Surah.find(
+        {
+          $or: [
+            { name: regex },
+            { transliteration: regex },
+            { translation: regex },
+          ],
+        },
+        { verses: 0 },
+      ).sort({ id: 1 });
+
+      return res.json(surahs);
+    }
+
     const surahs = await Surah.find({}, { verses: 0 }).sort({ id: 1 });
     res.json(surahs);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message,
+    });
   }
 });
 
-// Get single surah by number (without verses)
+// Get single surah
 router.get("/surahs/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { q } = req.query;
 
-    const surah = await Surah.findOne({ id: id }).lean();
+    const surah = await Surah.findOne({ id }).lean();
 
     if (!surah) {
-      return res.status(404).json({ error: "Surah not found" });
+      return res.status(404).json({
+        error: "Surah not found",
+      });
     }
 
     if (q && q.trim() !== "") {
       const regex = new RegExp(escapeRegex(q.trim()), "i");
-      const verses = surah.verses.filter(
-        (v) => v.translation || (v.text && regex.test(v.translation || v.text)),
-      );
-      return res.json({ ...surah, verses });
-    }
 
-    console.log(surah);
+      const verses = surah.verses.filter(
+        (v) => regex.test(v.translation || "") || regex.test(v.text || ""),
+      );
+
+      return res.json({
+        ...surah,
+        verses,
+      });
+    }
 
     res.json(surah);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message,
+    });
   }
 });
 
-module.exports = router;
+export default router;
