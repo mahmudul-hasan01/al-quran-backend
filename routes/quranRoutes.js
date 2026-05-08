@@ -32,10 +32,12 @@ router.get("/surahs/:id", async (req, res) => {
     if (q && q.trim() !== "") {
       const regex = new RegExp(escapeRegex(q.trim()), "i");
       const verses = surah.verses.filter(
-        (v) => v.translation && regex.test(v.translation),
+        (v) => v.translation || (v.text && regex.test(v.translation || v.text)),
       );
       return res.json({ ...surah, verses });
     }
+
+    console.log(surah);
 
     res.json(surah);
   } catch (error) {
